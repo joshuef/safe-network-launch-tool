@@ -96,7 +96,8 @@ pub fn run_with(cmd_args: Option<&[&str]>) -> Result<(), String> {
     let genesis_vault_args = build_vault_args(
         common_args.clone(),
         &genesis_vault_dir_str,
-        None, /* genesis */
+        None, /* genesis */,
+        &verbosity
     );
 
     // Let's launch genesis vault now
@@ -127,7 +128,7 @@ pub fn run_with(cmd_args: Option<&[&str]>) -> Result<(), String> {
             .to_string();
 
         let current_vault_args =
-            build_vault_args(common_args.clone(), &vault_dir, Some(&genesis_contact_info));
+            build_vault_args(common_args.clone(), &vault_dir, Some(&genesis_contact_info), &verbosity);
 
         let msg = format!("Launching vault #{}...", i);
         if args.verbosity > 0 {
@@ -165,6 +166,7 @@ fn build_vault_args<'a>(
     mut base_args: Vec<&'a str>,
     vault_dir: &'a str,
     contact_info: Option<&'a str>,
+    verbosity: &u8
 ) -> Vec<&'a str> {
     if let Some(contact) = contact_info {
         base_args.push("--hard-coded-contacts");
@@ -177,6 +179,9 @@ fn build_vault_args<'a>(
     base_args.push(vault_dir);
     base_args.push("--log-dir");
     base_args.push(vault_dir);
+
+    let vs = (0..*verbosity).map(|_| "v").collect::<String>();
+    base_args.push( format!("-{}", vs ));
 
     base_args
 }
